@@ -1,7 +1,6 @@
 'strict';
 
-import Sketch from './js/modules/class-sketch';
-import './scss/template/style.scss';
+import Brb from './js/modules/class-brb';
 
 import './scss/main.scss';
 import './js/assets';
@@ -10,7 +9,7 @@ import './js/assets';
 (function () {
     window.addEventListener('DOMContentLoaded', (event) => {
 
-        new Sketch({
+        new Brb({
             dom: document.getElementById('container')
         });
 

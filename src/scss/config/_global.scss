@@ -16,25 +16,5 @@ canvas {
 #container {
     width: 100vw;
     height: 100vh;
-    position: fixed;
-    z-index: -1;
-    top: 0;
-    left: 0;
-}
-
-.card {
-    width: 100%;
-    border: none !important;
-    margin-bottom: 60px;
-    background: none !important;
-    a {
-        display: block;
-        img {
-            width: 100%;
-            opacity: 0;
-        }
-        h2 {
-            margin-top: 30px;
-        }
-    }
+    background: #000;
 }
