@@ -1,0 +1,50 @@
+$body-bg: #fff;
+$body-color: #000;
+$grid-gutter-width: 20px;
+$accordion-icon-color: #fff;
+
+$theme-colors: (
+  "primary":    #F8CD41
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1335px
+);
+// carousel
+$carousel-indicator-width: 12px;
+$carousel-indicator-height : 12px;
+$carousel-indicator-hit-area-height: 0px;
+$carousel-indicator-spacer : 2px;
+$carousel-indicator-opacity : .2;
+$carousel-indicator-active-bg : #fff;
+$carousel-indicator-active-opacity : 1;
+$carousel-indicator-transition : opacity .6s ease;
+
+// accordion
+$accordion-icon-active-color: #fff;
+
+
+// nav
+$navbar-dark-color: #fff;
+$navbar-dark-hover-color: #fff;
+$navbar-dark-active-color: #fff;
+
+
+$navbar-toggler-border-radius: 0;
+$navbar-toggler-font-size: 19px;
+
+$nav-pills-link-active-bg: #fff;
+$nav-pills-link-active-color: #000;
+$nav-link-color: #000;
+$nav-link-hover-color: #F8CD41;
+
+
+$modal-header-border-width: 0;
+
+$modal-header-padding-x: 37px;
+
+$modal-backdrop-opacity: 0.7;

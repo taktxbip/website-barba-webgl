@@ -1,0 +1,26 @@
+$config: deep-map-merge( 
+    ( 
+        'font': 
+        ( 
+            'family-h': ('Mulish', 'system', sans-serif), 
+            'family-t': ('Lato', 'system', sans-serif), 
+            'size': 16px
+        ), 
+        'borders': ( 'radius-smaller': 3px, 'radius': 4px, 'radius-bigger': 6px), 
+        'color': ( 
+            'primary': ( '500': #FDB733,  '400': #F8CD41), 
+            'neutral': ( '700': #000, '500': #4B4B4B, '200': #DDE1E6),
+            'semantic': ( 'red': #CF2850)
+        ), 
+        'transition': .15s ease-in-out,
+        'responsive': (
+            'xs': 340px,
+            'sm': 575px,
+            'md': 767px,
+            'lg': 991px,
+            'xl': 1199px,
+            'xxl': 1399px
+        )
+    ), 
+    $config, true
+);
