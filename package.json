@@ -45,6 +45,7 @@
         "bootstrap": "^5.1.3",
         "core-js": "^3.6.4",
         "css-loader": "^3.4.2",
+        "dat.gui": "^0.7.9",
         "fontfaceobserver": "^2.1.0",
         "gsap": "^3.9.1",
         "imagesloaded": "^5.0.0",

@@ -4,6 +4,8 @@ import imagesLoaded from 'imagesloaded';
 import FontFaceObserver from 'fontfaceobserver';
 import gsap from 'gsap';
 import Scroll from '../scroll';
+import dat from 'dat.gui';
+import ocean from '../../images/ocean.jpeg';
 
 // import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
@@ -74,6 +76,7 @@ export default class Brb {
         const allPromises = [fontRoboto, preloadImages];
         Promise.all(allPromises).then(() => {
             // this.scroll = new Scroll();
+            this.setupSettings();
             this.addObjects();
             this.resize();
             this.events();
@@ -81,11 +84,31 @@ export default class Brb {
         });
     }
 
+    setupSettings() {
+        this.settings = {
+            progress: 0
+        };
+
+        this.gui = new dat.GUI();
+        this.gui.add(this.settings, 'progress', 0, 1, 0.001);
+    }
+
     addObjects() {
-        this.geometry = new THREE.BoxGeometry(100, 100, 0.2);
-        this.material = new THREE.MeshNormalMaterial();
+        this.geometry = new THREE.BoxGeometry(500, 500, 0.2);
+        this.material = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                uImage: { value: new THREE.TextureLoader().load(ocean) },
+                uProgress: { value: 0 },
+                uResolution: { value: new THREE.Vector2(this.width, this.height) },
+                uQuad: { value: new THREE.Vector2(500, 500) }
+            },
+            vertexShader: vertex,
+            fragmentShader: fragment
+        });
 
         this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh.rotation.z = 0.2;
         this.scene.add(this.mesh);
     }
 
@@ -126,9 +149,8 @@ export default class Brb {
 
         this.previousScroll = this.currentScroll;
 
-        this.materials.forEach(m => {
-            m.uniforms.time.value = this.time;
-        });
+        this.material.uniforms.time.value = this.time;
+        this.material.uniforms.uProgress.value = this.settings.progress;
 
         this.renderer.render(this.scene, this.camera);
         // this.composer.render(this.scene, this.camera);

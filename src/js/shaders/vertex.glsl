@@ -1,18 +1,24 @@
 varying vec2 vUv;
 uniform float time;
 uniform vec2 hover;
-uniform float hoverState;
+uniform vec2 uResolution;
+uniform vec2 uQuad;
+uniform float uProgress;
 varying float vNoise;
  
 void main() {
     vec3 newPosition = position;
 
-    float dist = distance(uv, hover);
+    // newPosition.x += uProgress * 100.;
 
-    newPosition.z += hoverState * 10.0 * sin(dist * 5. + time / 5.);
+    vec4 defaultState = modelMatrix * vec4( newPosition, 1.0 );
+    vec4 fullScreenState =  vec4( newPosition, 1.0 );
+    fullScreenState.x *= uResolution.x / uQuad.x;
+    fullScreenState.y *= uResolution.y / uQuad.y;
 
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( newPosition, 1.0 );
+    vec4 finalState = mix(fullScreenState, defaultState, uProgress);
 
-    vNoise = hoverState* sin(dist * 5. - time / 5.);
+    gl_Position = projectionMatrix * viewMatrix * finalState;
+
     vUv = uv;
 } 
