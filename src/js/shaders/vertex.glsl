@@ -1,3 +1,4 @@
+
 uniform float time;
 uniform vec2 uResolution;
 uniform vec2 uQuadSize;
@@ -12,12 +13,11 @@ void main() {
 
     float PI = 3.1415926;
 
-
     vec4 defaultState = modelMatrix * vec4( position, 1.0 );
     vec4 fullScreenState = vec4( position, 1.0 );
 
-    fullScreenState.x = fullScreenState.x * uResolution.x;
-    fullScreenState.y = fullScreenState.y * uResolution.y;
+    fullScreenState.x *= uResolution.x;
+    fullScreenState.y *= uResolution.y;
     fullScreenState.z += uCorners.x;
     
     float cornersProgress = mix(
@@ -26,12 +26,13 @@ void main() {
         uv.y
         );
 
-    vSize = mix(vec2(1., 1.), uResolution, cornersProgress);
+    vSize = mix(uQuadSize, uResolution, cornersProgress);
 
-    float sine = sin(PI * 0.);
-    float waves = sine * 0.1 * sin(5. * length(uv) + time);
+    // float sine = sin(PI * time * .05);
+    // float waves = sine * .05 * sin(5. * length(uv) + time);
+    // float waves = 0.5 + cnoise(vec3(cornersProgress / 10.)) * 0.5;
 
-    vec4 finalState = mix(defaultState, fullScreenState, cornersProgress + waves);
+    vec4 finalState = mix(defaultState, fullScreenState, cornersProgress);
 
     gl_Position = projectionMatrix * viewMatrix * finalState;
 

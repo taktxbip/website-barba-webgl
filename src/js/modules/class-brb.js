@@ -14,6 +14,7 @@ import barba from '@barba/core';
 // Shaders
 import fragment from '../shaders/fragment.glsl';
 import vertex from '../shaders/vertex.glsl';
+import perlinNoise from '../shaders/perlin-noise.glsl';
 
 export default class Brb {
     constructor(options) {
@@ -21,24 +22,27 @@ export default class Brb {
         this.dom = options.dom;
         this.materials = [];
         this.planeSegments = 100;
+        this.cornerAnimationDuration = 0.4;
 
         this.width = this.dom.offsetWidth;
         this.height = this.dom.offsetHeight;
 
         this.geometry = new THREE.PlaneBufferGeometry(1, 1, this.planeSegments, this.planeSegments);
+
         this.material = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 },
                 uImage: { value: new THREE.TextureLoader().load(checker) },
                 uProgress: { value: 0 },
                 uCorners: { value: new THREE.Vector4(0, 0, 0, 0) },
-                uTextureSize: { value: new THREE.Vector2(2048, 2048) },
-                uResolution: { value: new THREE.Vector2(this.width, this.height) }
-                // uQuadSize: { value: new THREE.Vector2(500, 500) }
+                uTextureSize: { value: new THREE.Vector2(500, 500) },
+                uResolution: { value: new THREE.Vector2(this.width, this.height) },
+                uQuadSize: { value: new THREE.Vector2(500, 500) }
             },
             side: THREE.DoubleSide,
-            vertexShader: vertex,
-            fragmentShader: fragment
+            vertexShader: perlinNoise + vertex,
+            fragmentShader: fragment,
+            wireframe: false
         });
 
         // setup
@@ -80,10 +84,90 @@ export default class Brb {
             this.setupSettings();
             this.addImages();
             this.setPositions();
-            // this.addObjects();
             this.resize();
             this.events();
             this.render();
+            this.barba();
+        });
+    }
+
+    barba() {
+        let that = this;
+        barba.init({
+            transitions: [{
+                name: 'from-home',
+                from: {
+                    namespace: ['home']
+                },
+                leave(data) {
+                    console.log('from-home');
+                    that.asscroll.disable();
+                    return gsap.timeline()
+                        .to(data.current.container, {
+                            opacity: 0
+                        });
+                },
+                enter(data) {
+                    that.asscroll = new ASScroll({
+                        disableRaf: true,
+                        containerElement: data.next.container.querySelector('[asscroll-container]')
+                    });
+                    that.asscroll.enable({
+                        newScrollElements: data.next.container.querySelector('.scroll-wrap')
+                    });
+                    return gsap.timeline()
+                        .from(data.next.container, {
+                            opacity: 0,
+                            onComplete: () => {
+                                that.dom.style.display = 'none';
+                            }
+                        });
+                }
+            },
+            {
+                name: 'from-inside',
+                from: {
+                    namespace: ['inside']
+                },
+                leave(data) {
+                    console.log('from-inside');
+                    that.asscroll.disable();
+                    return gsap.timeline()
+                        .to('.curtain', {
+                            duration: 0.3,
+                            y: 0
+                        })
+                        .to(data.current.container, {
+                            opacity: 0
+                        });
+                },
+                enter(data) {
+                    that.asscroll = new ASScroll({
+                        disableRaf: true,
+                        containerElement: data.next.container.querySelector('[asscroll-container]')
+                    });
+                    that.asscroll.enable({
+                        horizontalScroll: true,
+                        newScrollElements: data.next.container.querySelector('.scroll-wrap')
+                    });
+
+                    that.addImages();
+                    that.resize();
+
+                    return gsap.timeline()
+                        .to('.curtain', {
+                            duration: 0.3,
+                            y: '-100%'
+                        })
+                        .from(data.next.container, {
+                            opacity: 0,
+                            onComplete: () => {
+                                that.dom.style.display = 'none';
+                            }
+                        });
+                }
+            }
+            ]
         });
     }
 
@@ -96,9 +180,10 @@ export default class Brb {
             disableRaf: true
         });
 
-        this.asscroll.enable({
+        const scrollSettings = {
             horizontalScroll: !document.body.classList.contains('b-inside')
-        });
+        };
+        this.asscroll.enable(scrollSettings);
 
         // this.settings = {
         //     progress: 0
@@ -106,14 +191,6 @@ export default class Brb {
 
         // this.gui = new dat.GUI();
         // this.gui.add(this.settings, 'progress', 0, 1, 0.001);
-    }
-
-    addObjects() {
-        console.log(this.width, this.height);
-
-
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
-        this.scene.add(this.mesh);
     }
 
     addImages() {
@@ -136,19 +213,19 @@ export default class Brb {
                 this.tl = gsap.timeline()
                     .to(material.uniforms.uCorners.value, {
                         x: 1,
-                        duration: 0.4
+                        duration: this.cornerAnimationDuration,
                     })
                     .to(material.uniforms.uCorners.value, {
                         y: 1,
-                        duration: 0.4
+                        duration: this.cornerAnimationDuration,
                     }, 0.1)
                     .to(material.uniforms.uCorners.value, {
                         z: 1,
-                        duration: 0.4
+                        duration: this.cornerAnimationDuration,
                     }, 0.2)
                     .to(material.uniforms.uCorners.value, {
                         w: 1,
-                        duration: 0.4
+                        duration: this.cornerAnimationDuration,
                     }, 0.3);
             });
 
@@ -156,19 +233,19 @@ export default class Brb {
                 this.tl = gsap.timeline()
                     .to(material.uniforms.uCorners.value, {
                         x: 0,
-                        duration: 0.4
+                        duration: this.cornerAnimationDuration,
                     })
                     .to(material.uniforms.uCorners.value, {
                         y: 0,
-                        duration: 0.4
+                        duration: this.cornerAnimationDuration,
                     }, 0.1)
                     .to(material.uniforms.uCorners.value, {
                         z: 0,
-                        duration: 0.4
+                        duration: this.cornerAnimationDuration,
                     }, 0.2)
                     .to(material.uniforms.uCorners.value, {
                         w: 0,
-                        duration: 0.4
+                        duration: this.cornerAnimationDuration,
                     }, 0.3);
             });
 
@@ -220,8 +297,9 @@ export default class Brb {
 
         this.materials.forEach(m => {
             m.uniforms.uResolution.value.x = this.width;
-            m.uniforms.uResolution.value.x = this.height;
+            m.uniforms.uResolution.value.y = this.height;
         });
+
         this.imageStore.forEach(i => {
             const { width, height, top, left } = i.img.getBoundingClientRect();
             i.mesh.scale.set(width, height, 1);
@@ -229,6 +307,9 @@ export default class Brb {
             i.left = left + this.asscroll.currentPos;
             i.width = width;
             i.height = height;
+
+            i.mesh.material.uniforms.uQuadSize.value.x = width;
+            i.mesh.material.uniforms.uQuadSize.value.y = height;
 
             i.mesh.material.uniforms.uTextureSize.value.x = width;
             i.mesh.material.uniforms.uTextureSize.value.y = height;
@@ -241,9 +322,13 @@ export default class Brb {
         // this.asscroll.update();
         this.setPositions();
 
-        this.material.uniforms.time.value = this.time;
+        // this.materials.forEach(m => {
+        //     m.uniforms.time.value = this.time;
+        // });
+
         // this.tl.progress(this.settings.progress);
-        // this.material.uniforms.uProgress.value = this.settings.progress;
+        // console.log(this.imageStore[0]);
+        // this.imageStore[0].mesh.material.uniforms.uProgress.value = this.settings.progress;
 
         this.asscroll.update();
         this.renderer.render(this.scene, this.camera);
