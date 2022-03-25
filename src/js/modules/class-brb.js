@@ -21,6 +21,7 @@ export default class Brb {
         this.time = 0;
         this.dom = options.dom;
         this.materials = [];
+        this.imageStore = [];
         this.planeSegments = 100;
         this.cornerAnimationDuration = 0.4;
 
@@ -151,8 +152,14 @@ export default class Brb {
                         newScrollElements: data.next.container.querySelector('.scroll-wrap')
                     });
 
+                    that.materials = [];
+                    that.images = [];
+                    that.imageStore = [];
+
                     that.addImages();
+                    that.setPositions();
                     that.resize();
+                    that.events();
 
                     return gsap.timeline()
                         .to('.curtain', {
@@ -160,10 +167,7 @@ export default class Brb {
                             y: '-100%'
                         })
                         .from(data.next.container, {
-                            opacity: 0,
-                            onComplete: () => {
-                                that.dom.style.display = 'none';
-                            }
+                            opacity: 0
                         });
                 }
             }
@@ -209,7 +213,7 @@ export default class Brb {
 
             this.scene.add(mesh);
 
-            img.addEventListener('mouseover', e => {
+            img.addEventListener('click', e => {
                 this.tl = gsap.timeline()
                     .to(material.uniforms.uCorners.value, {
                         x: 1,
@@ -225,26 +229,6 @@ export default class Brb {
                     }, 0.2)
                     .to(material.uniforms.uCorners.value, {
                         w: 1,
-                        duration: this.cornerAnimationDuration,
-                    }, 0.3);
-            });
-
-            img.addEventListener('mouseout', e => {
-                this.tl = gsap.timeline()
-                    .to(material.uniforms.uCorners.value, {
-                        x: 0,
-                        duration: this.cornerAnimationDuration,
-                    })
-                    .to(material.uniforms.uCorners.value, {
-                        y: 0,
-                        duration: this.cornerAnimationDuration,
-                    }, 0.1)
-                    .to(material.uniforms.uCorners.value, {
-                        z: 0,
-                        duration: this.cornerAnimationDuration,
-                    }, 0.2)
-                    .to(material.uniforms.uCorners.value, {
-                        w: 0,
                         duration: this.cornerAnimationDuration,
                     }, 0.3);
             });
@@ -265,21 +249,6 @@ export default class Brb {
         window.addEventListener('resize', () => {
             this.resize();
         });
-
-        window.addEventListener('mousemove', e => {
-            this.mouse.x = (e.clientX / this.width) * 2 - 1;
-            this.mouse.y = - (e.clientY / this.height) * 2 + 1;
-
-            // this.raycaster.setFromCamera(this.mouse, this.camera);
-            // // // calculate objects intersecting the picking ray
-            // const intersects = this.raycaster.intersectObjects(this.scene.children);
-
-            // if (intersects.length > 0) {
-            //     let obj = intersects[0].object;
-            //     obj.material.uniforms.hover.value = intersects[0].uv;
-            // }
-
-        }, false);
     }
 
     resize() {
